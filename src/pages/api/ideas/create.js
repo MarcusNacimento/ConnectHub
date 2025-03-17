@@ -1,39 +1,26 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = global.prisma || new PrismaClient();
-if (process.env.NODE_ENV !== "production") global.prisma = prisma;
+import pool from '../../../utils/db';
+import { verifyToken } from '../../../middleware/verifyToken';
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método não permitido" });
-  }
+  if (req.method === 'POST') {
+    const { valid, user } = await verifyToken(req);
 
-  const { title, description } = req.body;
-
-  if (!title || !description) {
-    return res.status(400).json({ error: "Todos os campos são obrigatórios" });
-  }
-
-  try {
-    // 🔹 Busca o primeiro usuário existente no banco
-    const user = await prisma.user.findFirst();
-    if (!user) {
-      return res.status(400).json({ error: "Nenhum usuário encontrado. Cadastre um usuário primeiro." });
+    if (!valid) {
+      return res.status(401).json({ error: 'Acesso não autorizado.' });
     }
 
-    // 🔹 Agora criamos a ideia associada ao usuário encontrado
-    const newIdea = await prisma.idea.create({
-      data: { 
-        title, 
-        description, 
-        userId: user.id // 🔥 Agora temos certeza que o userId é válido!
-      },
-    });
+    const { title, description } = req.body;
 
-    console.log("Ideia criada:", newIdea);
-    res.status(201).json(newIdea);
-  } catch (error) {
-    console.error("Erro ao criar ideia:", error);
-    res.status(500).json({ error: "Erro ao criar ideia", details: error.message });
+    try {
+      await pool.query(
+        'INSERT INTO ideas (title, description, user_id) VALUES ($1, $2, $3)',
+        [title, description, user.id]
+      );
+      res.status(201).json({ message: 'Ideia criada com sucesso!' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    res.status(405).json({ error: 'Método não permitido' });
   }
 }

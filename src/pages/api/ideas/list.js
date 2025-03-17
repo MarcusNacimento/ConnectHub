@@ -1,16 +1,20 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import pool from '../../../utils/db';
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Método não permitido" });
-  }
+  if (req.method === 'GET') {
+    try {
+      const result = await pool.query(`
+        SELECT ideas.*, users.name AS user_name
+        FROM ideas
+        INNER JOIN users ON ideas.user_id = users.id
+        ORDER BY ideas.id DESC
+      `);
 
-  try {
-    const ideas = await prisma.idea.findMany();
-    res.status(200).json(ideas);
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar ideias" });
+      res.status(200).json({ ideas: result.rows });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    res.status(405).json({ error: 'Método não permitido' });
   }
 }
