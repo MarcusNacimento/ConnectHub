@@ -1,18 +1,20 @@
-import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
+  const fetchUser = async () => {
+    const res = await fetch('/api/auth/me');
+    if (res.ok) {
+      const data = await res.json();
+      setUser(data.user);
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      }
-    };
     fetchUser();
   }, []);
 
@@ -22,30 +24,30 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-white shadow-md py-4 px-6 flex justify-between items-center mb-6">
-      <h1 className="text-2xl font-bold text-blue-600 cursor-pointer" onClick={() => router.push('/')}>
-        ConnectHub
-      </h1>
-      <div className="text-right">
-        {user ? (
-          <>
-            <p className="text-sm mb-1">Logado como <strong>{user.email}</strong></p>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700"
-            >
-              Sair
-            </button>
-          </>
-        ) : (
+    <nav className="bg-white shadow p-4 mb-8 flex justify-between items-center">
+      <Link href="/">
+        <span className="text-xl font-bold text-blue-600 cursor-pointer">ConnectHub</span>
+      </Link>
+      <div className="flex gap-4 items-center">
+        {user && router.pathname !== '/favorites' && (
+          <Link href="/favorites">
+            <span className="text-yellow-500 font-medium cursor-pointer hover:underline">⭐ Meus Favoritos</span>
+          </Link>
+        )}
+        {user && (
+          <Link href="/my-ideas">
+            <span className="text-blue-500 font-medium cursor-pointer hover:underline">📌 Minhas Ideias</span>
+          </Link>
+        )}
+        {user && (
           <button
-            onClick={() => router.push('/login')}
-            className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+            onClick={handleLogout}
+            className="text-sm text-red-600 hover:underline"
           >
-            Login
+            Sair
           </button>
         )}
       </div>
-    </header>
+    </nav>
   );
 }

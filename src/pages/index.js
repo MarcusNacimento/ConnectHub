@@ -31,6 +31,24 @@ export default function HomePage() {
     fetchIdeas();
   }, []);
 
+  const handleLike = async (id) => {
+    await fetch('/api/ideas/like', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ideaId: id }),
+    });
+    fetchIdeas();
+  };
+
+  const handleFavorite = async (id) => {
+    await fetch('/api/ideas/favorite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ideaId: id }),
+    });
+    fetchIdeas();
+  };
+
   const filteredIdeas = ideas.filter((idea) => {
     const matchesTitle = idea.title.toLowerCase().includes(searchTitle.toLowerCase());
     const matchesAuthor = idea.user_name.toLowerCase().includes(searchAuthor.toLowerCase());
@@ -128,10 +146,27 @@ export default function HomePage() {
               </div>
               <div className="grid gap-6">
                 {latestIdeas.map((idea) => (
-                  <div key={idea.id} className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg hover:translate-y-1 transition">
+                  <div key={idea.id} className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg hover:translate-y-1 transition relative">
                     <h3 className="text-lg font-semibold mb-1 text-blue-700">{idea.title}</h3>
                     <p className="text-gray-700 leading-relaxed">{idea.description}</p>
                     <p className="text-sm text-gray-500 mt-2">por {idea.user_name}</p>
+
+                    {user && (
+                      <div className="flex gap-4 mt-4">
+                        <button
+                          onClick={() => handleLike(idea.id)}
+                          className="flex items-center gap-1 text-red-600 hover:scale-105 transition"
+                        >
+                          ❤️ {idea.likes || 0}
+                        </button>
+                        <button
+                          onClick={() => handleFavorite(idea.id)}
+                          className="text-yellow-500 hover:scale-105 transition"
+                        >
+                          ⭐
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -142,10 +177,27 @@ export default function HomePage() {
               <h3 className="text-xl font-bold mb-4 text-gray-700">🔥 Ideias populares</h3>
               <div className="grid gap-6">
                 {popularIdeas.map((idea) => (
-                  <div key={idea.id} className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg hover:translate-y-1 transition">
+                  <div key={idea.id} className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg hover:translate-y-1 transition relative">
                     <h3 className="text-lg font-semibold mb-1 text-blue-700">{idea.title}</h3>
                     <p className="text-gray-700 leading-relaxed">{idea.description}</p>
                     <p className="text-sm text-gray-500 mt-2">por {idea.user_name}</p>
+
+                    {user && (
+                      <div className="flex gap-4 mt-4">
+                        <button
+                          onClick={() => handleLike(idea.id)}
+                          className="flex items-center gap-1 text-red-600 hover:scale-105 transition"
+                        >
+                          ❤️ {idea.likes || 0}
+                        </button>
+                        <button
+                          onClick={() => handleFavorite(idea.id)}
+                          className="hover:scale-105 transition"
+                        >
+                          {idea.favorited_by.includes(user.id) ? '⭐' : '☆'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
