@@ -55,10 +55,11 @@ export default function HomePage() {
     return matchesTitle && matchesAuthor;
   });
 
-  const featuredIdea = filteredIdeas[0];
-  const otherIdeas = filteredIdeas.slice(1);
+  // const featuredIdea = filteredIdeas[0];
+  // const otherIdeas = filteredIdeas.slice(1);
+  const otherIdeas = filteredIdeas;
   const latestIdeas = otherIdeas.slice(0, latestLimit);
-  const popularIdeas = otherIdeas.filter(idea => idea.description.length > 50);
+  const popularIdeas = [...otherIdeas].filter((idea) => (idea.likes || 0) > 0).sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
@@ -68,7 +69,7 @@ export default function HomePage() {
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-10 mb-10 shadow-xl max-w-5xl mx-auto mt-6 transition hover:scale-[1.02]">
         <h2 className="text-5xl font-extrabold mb-4 tracking-tight">Compartilhe suas ideias 💡</h2>
         {user ? (
-          <p className="mb-2 text-lg">Bem-vindo de volta, <strong>{user.email}</strong> 👋</p>
+          <p className="mb-2 text-lg">Bem-vindo de volta, <strong>{user.name}</strong> 👋</p>
         ) : (
           <p className="mb-2 text-lg">Junte-se à comunidade e compartilhe suas ideias!</p>
         )}
@@ -117,14 +118,14 @@ export default function HomePage() {
         </div>
 
         {/* IDEIA EM DESTAQUE */}
-        {featuredIdea && (
+        {/* {featuredIdea && (
           <div className="bg-yellow-100 border-l-4 border-yellow-500 p-6 mb-8 rounded-2xl shadow-md hover:shadow-lg transition">
             <h3 className="text-2xl font-bold text-yellow-700 mb-2">🌟 Ideia em Destaque</h3>
             <h4 className="text-xl font-semibold text-yellow-800">{featuredIdea.title}</h4>
             <p className="text-gray-700 mt-2 leading-relaxed">{featuredIdea.description}</p>
             <p className="text-sm text-gray-600 mt-2">por {featuredIdea.user_name}</p>
           </div>
-        )}
+        )} */}
 
         {loading ? (
           <p className="text-center text-gray-600">Carregando ideias...</p>
