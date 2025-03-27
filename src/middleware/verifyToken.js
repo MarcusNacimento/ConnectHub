@@ -20,8 +20,7 @@ export async function verifyToken(req) {
 
     return { valid: true, user: userRes.rows[0] };
   } catch (err) {
-    console.error('Erro ao verificar token:', err); 
-
+    console.error('Erro ao verificar token:', err);
     return { valid: false };
   }
 }
