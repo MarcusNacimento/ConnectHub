@@ -23,7 +23,6 @@ export default async function handler(req, res) {
 
     const idea = rows[0];
 
-    // Simples: 1 like por usuário (toggle)
     const liked = idea.favorited_by.includes(user.id);
 
     if (liked) {

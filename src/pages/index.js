@@ -12,17 +12,29 @@ export default function HomePage() {
   const router = useRouter();
 
   const fetchIdeas = async () => {
-    const res = await fetch('/api/ideas/list');
-    const data = await res.json();
-    setIdeas(data.ideas);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/ideas/list', {
+        credentials: 'include', // <-- Adicionado
+      });
+      const data = await res.json();
+      setIdeas(data.ideas || []);
+    } catch (err) {
+      console.error('Erro ao buscar ideias:', err);
+      setIdeas([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchUser = async () => {
-    const res = await fetch('/api/auth/me');
-    if (res.ok) {
-      const data = await res.json();
-      setUser(data.user);
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+      }
+    } catch (err) {
+      console.error('Erro ao buscar usuário:', err);
     }
   };
 
@@ -36,30 +48,32 @@ export default function HomePage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ideaId: id }),
+      credentials: 'include', // <-- Adicionado
     });
     fetchIdeas();
   };
-
+  
   const handleFavorite = async (id) => {
     await fetch('/api/ideas/favorite', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ideaId: id }),
+      credentials: 'include', // <-- Adicionado
     });
     fetchIdeas();
   };
 
-  const filteredIdeas = ideas.filter((idea) => {
+  const filteredIdeas = (ideas || []).filter((idea) => {
     const matchesTitle = idea.title.toLowerCase().includes(searchTitle.toLowerCase());
     const matchesAuthor = idea.user_name.toLowerCase().includes(searchAuthor.toLowerCase());
     return matchesTitle && matchesAuthor;
   });
 
-  // const featuredIdea = filteredIdeas[0];
-  // const otherIdeas = filteredIdeas.slice(1);
-  const otherIdeas = filteredIdeas;
-  const latestIdeas = otherIdeas.slice(0, latestLimit);
-  const popularIdeas = [...otherIdeas].filter((idea) => (idea.likes || 0) > 0).sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 5);
+  const latestIdeas = filteredIdeas.slice(0, latestLimit);
+  const popularIdeas = [...filteredIdeas]
+    .filter((idea) => (idea.likes || 0) > 0)
+    .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+    .slice(0, 5);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
@@ -117,21 +131,10 @@ export default function HomePage() {
           />
         </div>
 
-        {/* IDEIA EM DESTAQUE */}
-        {/* {featuredIdea && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 p-6 mb-8 rounded-2xl shadow-md hover:shadow-lg transition">
-            <h3 className="text-2xl font-bold text-yellow-700 mb-2">🌟 Ideia em Destaque</h3>
-            <h4 className="text-xl font-semibold text-yellow-800">{featuredIdea.title}</h4>
-            <p className="text-gray-700 mt-2 leading-relaxed">{featuredIdea.description}</p>
-            <p className="text-sm text-gray-600 mt-2">por {featuredIdea.user_name}</p>
-          </div>
-        )} */}
-
         {loading ? (
           <p className="text-center text-gray-600">Carregando ideias...</p>
         ) : (
           <>
-            {/* ÚLTIMAS IDEIAS */}
             <div className="mb-12">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold text-gray-700">🆕 Últimas ideias</h3>
@@ -173,7 +176,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* IDEIAS POPULARES */}
             <div>
               <h3 className="text-xl font-bold mb-4 text-gray-700">🔥 Ideias populares</h3>
               <div className="grid gap-6">
@@ -195,7 +197,7 @@ export default function HomePage() {
                           onClick={() => handleFavorite(idea.id)}
                           className="hover:scale-105 transition"
                         >
-                          {idea.favorited_by.includes(user.id) ? '⭐' : '☆'}
+                          {idea.favorited_by?.includes(user.id) ? '⭐' : '☆'}
                         </button>
                       </div>
                     )}

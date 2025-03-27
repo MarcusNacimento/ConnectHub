@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import pool from '../utils/db';
+import cookie from 'cookie';
 
 export async function verifyToken(req) {
-  const token = req.cookies.token;
+  const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {};
+  const token = cookies.token;
 
   if (!token) {
     return { valid: false };
