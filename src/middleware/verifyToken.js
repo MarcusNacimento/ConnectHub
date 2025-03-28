@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import pool from '../utils/db';
-import cookie from 'cookie';
+import * as cookie from 'cookie';
 
 export async function verifyToken(req) {
   try {
