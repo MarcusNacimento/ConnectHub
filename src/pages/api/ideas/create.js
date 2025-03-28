@@ -13,8 +13,8 @@ export default async function handler(req, res) {
 
     try {
       await pool.query(
-        'INSERT INTO ideas (title, description, user_id) VALUES ($1, $2, $3)',
-        [title, description, user.id]
+        'INSERT INTO ideas (title, description, user_id, favorited_by) VALUES ($1, $2, $3, $4)',
+        [title, description, user.id, {}]
       );
       res.status(201).json({ message: 'Ideia criada com sucesso!' });
     } catch (err) {

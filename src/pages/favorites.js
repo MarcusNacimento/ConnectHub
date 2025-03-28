@@ -19,14 +19,24 @@ export default function FavoritesPage() {
   };
 
   const fetchFavorites = async () => {
-    const res = await fetch('/api/ideas/list');
-    const data = await res.json();
-    const userId = user?.id;
-    const favorites = data.ideas.filter((idea) => idea.favorited_by.includes(userId));
-    setIdeas(favorites);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/ideas/list', { credentials: 'include' });
+      const data = await res.json();
+      const userId = user?.id;
+  
+      const favorites = (data.ideas || []).filter((idea) =>
+        (idea.favorited_by || []).includes(userId)
+      );
+  
+      setIdeas(favorites);
+    } catch (err) {
+      console.error('Erro ao buscar favoritos:', err);
+      setIdeas([]);
+    } finally {
+      setLoading(false);
+    }
   };
-
+  
   useEffect(() => {
     fetchUser();
   }, []);
