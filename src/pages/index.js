@@ -167,7 +167,7 @@ export default function HomePage() {
                           onClick={() => handleFavorite(idea.id)}
                           className="text-yellow-500 hover:scale-105 transition"
                         >
-                          ⭐
+                          {idea.favorited_by?.includes(user.id) ? '⭐' : '☆'}
                         </button>
                       </div>
                     )}
