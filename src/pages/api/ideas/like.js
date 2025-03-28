@@ -23,12 +23,19 @@ export default async function handler(req, res) {
 
     const idea = rows[0];
 
-    const liked = idea.likes_users?.includes(user.id); 
+    const liked = idea.liked_by?.includes(user.id); // <-- Usando liked_by agora
 
-    await pool.query(
-      'UPDATE ideas SET likes = likes + $1 WHERE id = $2',
-      [liked ? -1 : 1, ideaId]
-    );
+    if (liked) {
+      await pool.query(
+        'UPDATE ideas SET likes = likes - 1, liked_by = array_remove(liked_by, $1) WHERE id = $2',
+        [user.id, ideaId]
+      );
+    } else {
+      await pool.query(
+        'UPDATE ideas SET likes = likes + 1, liked_by = array_append(liked_by, $1) WHERE id = $2',
+        [user.id, ideaId]
+      );
+    }
 
     return res.status(200).json({ message: liked ? 'Like removido' : 'Like adicionado' });
   } catch (err) {
