@@ -3,8 +3,15 @@ import pool from '../utils/db';
 import cookie from 'cookie';
 
 export async function verifyToken(req) {
-  const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {};
-  const token = cookies.token;
+  const rawCookie = req.headers?.cookie || '';
+  let token = '';
+
+  try {
+    const parsed = cookie.parse(rawCookie);
+    token = parsed.token;
+  } catch (err) {
+    console.error('❌ Erro ao fazer parse dos cookies:', err); 
+  }
 
   if (!token) {
     console.error('❌ Token ausente nos cookies.');
@@ -25,7 +32,7 @@ export async function verifyToken(req) {
 
     return { valid: true, user: userRes.rows[0] };
   } catch (err) {
-    console.error('❌ Erro ao verificar token:', err); // <-- ESSA LINHA É A MAIS IMPORTANTE
+    console.error('❌ Erro ao verificar token:', err);
     return { valid: false };
   }
 }
