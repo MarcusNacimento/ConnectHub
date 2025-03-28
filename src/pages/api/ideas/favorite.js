@@ -22,10 +22,9 @@ export default async function handler(req, res) {
     }
 
     const idea = rows[0];
+    const alreadyFavorited = idea.favorited_by?.includes(user.id);
 
-    const favorited = idea.favorited_by.includes(user.id);
-
-    if (favorited) {
+    if (alreadyFavorited) {
       await pool.query(
         'UPDATE ideas SET favorited_by = array_remove(favorited_by, $1) WHERE id = $2',
         [user.id, ideaId]
@@ -37,7 +36,9 @@ export default async function handler(req, res) {
       );
     }
 
-    return res.status(200).json({ message: favorited ? 'Removido dos favoritos' : 'Adicionado aos favoritos' });
+    return res.status(200).json({
+      message: alreadyFavorited ? 'Favorito removido' : 'Favorito adicionado',
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
