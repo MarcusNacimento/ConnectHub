@@ -3,25 +3,20 @@ import pool from '../utils/db';
 import cookie from 'cookie';
 
 export async function verifyToken(req) {
-  let token = null;
-
   try {
-    const rawCookie = req.headers?.cookie;
-    if (rawCookie) {
-      const parsed = cookie.parse(rawCookie);
-      token = parsed.token;
+    if (!req.headers || !req.headers.cookie) {
+      console.error('❌ Nenhum header ou cookie encontrado.');
+      return { valid: false };
     }
-  } catch (err) {
-    console.error('❌ Erro ao fazer parse dos cookies:', err);
-    return { valid: false };
-  }
 
-  if (!token) {
-    console.error('❌ Token ausente nos cookies.');
-    return { valid: false };
-  }
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const token = cookies.token;
 
-  try {
+    if (!token) {
+      console.error('❌ Token ausente nos cookies.');
+      return { valid: false };
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userRes = await pool.query(
       'SELECT id, email, name FROM users WHERE id = $1',
