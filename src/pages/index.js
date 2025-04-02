@@ -185,7 +185,7 @@ export default function HomePage() {
             {(activeTab === 'latest' ? latestIdeas : favoriteIdeas.slice(0, latestLimit)).map((idea) => (
               <div key={idea.id} className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg hover:translate-y-1 transition relative">
                 <h3 className="text-lg font-semibold mb-1 text-blue-700">{idea.title}</h3>
-                <p className="text-gray-700 leading-relaxed">{idea.description}</p>
+                <p className="text-gray-700 leading-relaxed line-clamp-3">{idea.description}</p>
                 <p className="text-sm text-gray-500 mt-2">por {idea.user_name}</p>
 
                 {user && (
