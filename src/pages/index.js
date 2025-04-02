@@ -153,29 +153,17 @@ export default function HomePage() {
             </button>
           </div>
 
-          {activeTab === 'latest' && (
-            <select
-              value={latestLimit}
-              onChange={(e) => setLatestLimit(Number(e.target.value))}
-              className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring focus:ring-blue-400"
-            >
-              <option value={3}>Mostrar 3</option>
-              <option value={5}>Mostrar 5</option>
-              <option value={10}>Mostrar 10</option>
-            </select>
-          )}
-
-          {activeTab === 'favorites' && (
-            <select
-              value={latestLimit}
-              onChange={(e) => setLatestLimit(Number(e.target.value))}
-              className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring focus:ring-yellow-400"
-            >
-              <option value={3}>Mostrar 3</option>
-              <option value={5}>Mostrar 5</option>
-              <option value={10}>Mostrar 10</option>
-            </select>
-          )}
+          <select
+            value={latestLimit}
+            onChange={(e) => setLatestLimit(Number(e.target.value))}
+            className={`border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring ${
+              activeTab === 'favorites' ? 'focus:ring-yellow-400' : 'focus:ring-blue-400'
+            }`}
+          >
+            <option value={3}>Mostrar 3</option>
+            <option value={5}>Mostrar 5</option>
+            <option value={10}>Mostrar 10</option>
+          </select>
         </div>
 
         {loading ? (
@@ -183,7 +171,11 @@ export default function HomePage() {
         ) : (
           <div className="grid gap-6">
             {(activeTab === 'latest' ? latestIdeas : favoriteIdeas.slice(0, latestLimit)).map((idea) => (
-              <div key={idea.id} className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg hover:translate-y-1 transition relative">
+              <div
+                key={idea.id}
+                onClick={() => router.push(`/idea/${idea.id}`)}
+                className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg hover:translate-y-1 transition relative cursor-pointer"
+              >
                 <h3 className="text-lg font-semibold mb-1 text-blue-700">{idea.title}</h3>
                 <p className="text-gray-700 leading-relaxed line-clamp-3">{idea.description}</p>
                 <p className="text-sm text-gray-500 mt-2">por {idea.user_name}</p>
@@ -191,13 +183,19 @@ export default function HomePage() {
                 {user && (
                   <div className="flex gap-4 mt-4">
                     <button
-                      onClick={() => handleLike(idea.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLike(idea.id);
+                      }}
                       className="flex items-center gap-1 text-red-600 hover:scale-105 transition"
                     >
                       ❤️ {idea.likes || 0}
                     </button>
                     <button
-                      onClick={() => handleFavorite(idea.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFavorite(idea.id);
+                      }}
                       className="hover:scale-105 transition"
                     >
                       {idea.favorited_by?.includes(user.id) ? '⭐' : '☆'}
