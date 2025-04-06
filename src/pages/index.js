@@ -3,9 +3,8 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import SessionTimer from '../components/SessionTimer';
 import jwt from 'jsonwebtoken';
-import cookie from 'cookie';
+import * as cookie from 'cookie';
 import { verifyToken } from '../middleware/verifyToken';
-
 
 
 export default function HomePage({tokenExp}) {
