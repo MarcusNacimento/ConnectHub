@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
+import SessionTimer from '../components/SessionTimer';
+import jwt from 'jsonwebtoken';
+import cookie from 'cookie';
+import { verifyToken } from '../middleware/verifyToken';
 
-export default function HomePage() {
+
+
+export default function HomePage({tokenExp}) {
   const [ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -82,6 +88,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
       <Navbar />
+      <SessionTimer tokenExp={tokenExp} />
+
 
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-10 mb-10 shadow-xl max-w-5xl mx-auto mt-6 transition hover:scale-[1.02]">
         <h2 className="text-5xl font-extrabold mb-4 tracking-tight">Compartilhe suas ideias 💡</h2>
@@ -209,4 +217,29 @@ export default function HomePage() {
       </main>
     </div>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { req } = context;
+
+  const { valid } = await verifyToken(req);
+  const cookies = cookie.parse(req.headers.cookie || '');
+  const token = cookies.token;
+
+  let exp = null;
+
+  if (token) {
+    try {
+      const decoded = jwt.decode(token);
+      exp = decoded.exp * 1000; 
+    } catch (err) {
+      console.error('Erro ao decodificar token:', err);
+    }
+  }
+
+  return {
+    props: {
+      tokenExp: exp || null,
+    },
+  };
 }
