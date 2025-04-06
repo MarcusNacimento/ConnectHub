@@ -68,7 +68,7 @@ export default function MyIdeasPage() {
                 <p className="text-gray-700 leading-relaxed">{idea.description}</p>
                 <div className="flex gap-3 mt-4">
                   <button
-                    onClick={() => router.push(`/edit-idea?id=${idea.id}`)}
+                    onClick={() => router.push(`/edit-idea/${idea.id}`)}
                     className="text-sm bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                   >
                     Editar

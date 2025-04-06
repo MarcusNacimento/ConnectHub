@@ -7,7 +7,7 @@ import * as cookie from 'cookie';
 import { verifyToken } from '../middleware/verifyToken';
 
 
-export default function HomePage({tokenExp}) {
+export default function HomePage({ tokenExp }) {
   const [ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -144,32 +144,31 @@ export default function HomePage({tokenExp}) {
           <div className="flex space-x-3">
             <button
               onClick={() => setActiveTab('latest')}
-              className={`px-4 py-2 rounded-lg font-semibold ${
-                activeTab === 'latest' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
+              className={`px-4 py-2 rounded-lg font-semibold ${activeTab === 'latest' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
             >
               🆕 Últimas ideias
             </button>
             <button
-              onClick={() => setActiveTab('favorites')}
-              className={`px-4 py-2 rounded-lg font-semibold ${
-                activeTab === 'favorites' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
+              onClick={() => setActiveTab('popular')}
+              className={`px-4 py-2 rounded-lg font-semibold ${activeTab === 'popular' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
             >
-              ⭐ Favoritas
+              🔥 Ideias populares
             </button>
           </div>
 
           <select
             value={latestLimit}
             onChange={(e) => setLatestLimit(Number(e.target.value))}
-            className={`border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring ${
-              activeTab === 'favorites' ? 'focus:ring-yellow-400' : 'focus:ring-blue-400'
-            }`}
+            className={`border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring ${activeTab === 'favorites' ? 'focus:ring-yellow-400' : 'focus:ring-blue-400'
+              }`}
           >
             <option value={3}>Mostrar 3</option>
             <option value={5}>Mostrar 5</option>
             <option value={10}>Mostrar 10</option>
+            <option value={25}>Mostrar 25</option>
+            <option value={50}>Mostrar 50</option>
           </select>
         </div>
 
@@ -177,7 +176,10 @@ export default function HomePage({tokenExp}) {
           <p className="text-center text-gray-600">Carregando ideias...</p>
         ) : (
           <div className="grid gap-6">
-            {(activeTab === 'latest' ? latestIdeas : favoriteIdeas.slice(0, latestLimit)).map((idea) => (
+            {(activeTab === 'latest'
+              ? latestIdeas
+              : popularIdeas.slice(0, latestLimit)
+            ).map((idea) => (
               <div
                 key={idea.id}
                 onClick={() => router.push(`/idea/${idea.id}`)}
@@ -230,7 +232,7 @@ export async function getServerSideProps(context) {
   if (token) {
     try {
       const decoded = jwt.decode(token);
-      exp = decoded.exp * 1000; 
+      exp = decoded.exp * 1000;
     } catch (err) {
       console.error('Erro ao decodificar token:', err);
     }
