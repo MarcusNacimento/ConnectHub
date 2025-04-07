@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         expiresIn: '30m',
       });
 
-      res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Path=/; Max-Age=604800; SameSite=Lax; Secure`);
+      res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Path=/; Max-Age=1800; SameSite=Lax; Secure`);
 
       res.status(200).json({ message: 'Login bem-sucedido!' });
     } catch (err) {

@@ -9,6 +9,12 @@ export default async function handler(req, res) {
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Preencha todos os campos.' });
     }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'E-mail inválido.' });
+    }
 
     try {
       const exists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -30,7 +36,7 @@ export default async function handler(req, res) {
         expiresIn: '30m',
       });
 
-      res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Path=/; Max-Age=604800; SameSite=Lax`);
+      res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Path=/; Max-Age=1800; SameSite=Lax`);
 
       res.status(201).json({ message: 'Usuário criado e logado com sucesso!' });
     } catch (err) {

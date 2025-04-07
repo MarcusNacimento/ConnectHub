@@ -13,7 +13,7 @@ export default function HomePage({ tokenExp }) {
   const [user, setUser] = useState(null);
   const [searchTitle, setSearchTitle] = useState('');
   const [searchAuthor, setSearchAuthor] = useState('');
-  const [latestLimit, setLatestLimit] = useState(5);
+  const [latestLimit, setLatestLimit] = useState(10);
   const [activeTab, setActiveTab] = useState('latest');
   const router = useRouter();
 
@@ -93,7 +93,7 @@ export default function HomePage({ tokenExp }) {
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-10 mb-10 shadow-xl max-w-5xl mx-auto mt-6 transition hover:scale-[1.02]">
         <h2 className="text-5xl font-extrabold mb-4 tracking-tight">Compartilhe suas ideias 💡</h2>
         {user ? (
-          <p className="mb-2 text-lg">Bem-vindo de volta, <strong>{user.name}</strong> 👋</p>
+          <p className="mb-2 text-lg">Bem-vindo  <strong>{user.name}</strong> 👋</p>
         ) : (
           <p className="mb-2 text-lg">Junte-se à comunidade e compartilhe suas ideias!</p>
         )}
